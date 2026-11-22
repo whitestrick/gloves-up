@@ -1,4 +1,8 @@
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+} from 'firebase/auth'
 import { auth } from './firebase'
 
 const messages = {
@@ -6,6 +10,8 @@ const messages = {
   'auth/invalid-email': 'Enter a valid email address.',
   'auth/weak-password': 'Password must be at least 8 characters.',
   'auth/invalid-credential': 'Wrong email or password.',
+  'auth/user-not-found': 'Wrong email or password.',
+  'auth/wrong-password': 'Wrong email or password.',
   'auth/too-many-requests': 'Too many attempts. Try again later.',
   'auth/network-request-failed': 'Network problem. Check your connection.',
 }
@@ -16,4 +22,12 @@ export function friendlyError(error) {
 
 export function registerUser(email, password) {
   return createUserWithEmailAndPassword(auth, email, password)
+}
+
+export function loginUser(email, password) {
+  return signInWithEmailAndPassword(auth, email, password)
+}
+
+export function logoutUser() {
+  return signOut(auth)
 }
