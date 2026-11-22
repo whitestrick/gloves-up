@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import AuthForm from '../components/AuthForm'
 import Button from '../components/Button' // NEW: reused for the Google button
 import useAuth from '../hooks/useAuth'
@@ -9,13 +9,15 @@ import { registerUser, loginUser, loginWithGoogle, friendlyError } from '../serv
 export default function Login() {
   const { user, loading } = useAuth() // user comes from AuthContext
   const { showToast } = useToast()
+  const location = useLocation() // NEW: ProtectedRoute stores the blocked page here
+  const from = location.state?.from?.pathname || '/routines' // NEW: where to go after login
   const [mode, setMode] = useState('login') // 'login' or 'signup'
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const isSignup = mode === 'signup'
 
   // If the user is already logged in (email OR Google), send them to the app
-  if (!loading && user) return <Navigate to="/routines" replace />
+  if (!loading && user) return <Navigate to={from} replace />
 
   function switchMode(next) {
     setMode(next)
