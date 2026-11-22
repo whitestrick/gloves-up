@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import AuthForm from '../components/AuthForm'
+import Button from '../components/Button' // NEW: reused for the Google button
 import useAuth from '../hooks/useAuth'
 import useToast from '../hooks/useToast'
-import { registerUser, loginUser, friendlyError } from '../services/authService'
+import { registerUser, loginUser, loginWithGoogle, friendlyError } from '../services/authService'
 
 export default function Login() {
-  const { user, loading } = useAuth()
+  const { user, loading } = useAuth() // user comes from AuthContext
   const { showToast } = useToast()
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState('login') // 'login' or 'signup'
   const [error, setError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const isSignup = mode === 'signup'
 
+  // If the user is already logged in (email OR Google), send them to the app
   if (!loading && user) return <Navigate to="/routines" replace />
 
   function switchMode(next) {
@@ -20,6 +22,7 @@ export default function Login() {
     setError('')
   }
 
+  // Runs when the email/password form is submitted
   async function handleSubmit(email, password) {
     setError('')
     setSubmitting(true)
@@ -37,6 +40,22 @@ export default function Login() {
     }
   }
 
+  // NEW: runs when the user clicks "Continue with Google".
+  // Same pattern as handleSubmit: clear the old error, disable the button,
+  // try the sign-in, and show a friendly message if it fails.
+  async function handleGoogle() {
+    setError('')
+    setSubmitting(true)
+    try {
+      await loginWithGoogle()
+      showToast('Signed in with Google!')
+    } catch (err) {
+      setError(friendlyError(err))
+      setSubmitting(false)
+    }
+  }
+
+  // Small helper that builds one of the two Log in / Sign up tab buttons
   const tab = (value, label) => (
     <button
       type="button"
@@ -73,6 +92,17 @@ export default function Login() {
             error={error}
             submitting={submitting}
           />
+          {/* NEW: divider + Google button */}
+          <p className="my-4 text-center text-sm text-neutral-600">or</p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            onClick={handleGoogle}
+            disabled={submitting}
+          >
+            Continue with Google
+          </Button>
         </div>
       </section>
     </main>
