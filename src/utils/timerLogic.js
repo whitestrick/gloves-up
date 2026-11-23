@@ -41,3 +41,10 @@ export function tick(state, config) {
   // That was the last second of the phase: move on
   return nextPhase(ticked, config)
 }
+
+// How many rounds were FULLY finished? A round counts once its work phase is over.
+// work phase: we are still inside this round, so only the earlier ones count.
+// rest phase: the round just ended, so it counts. finished: the last round counts too.
+export function completedRounds({ phase, round }) {
+  return phase === 'work' ? round - 1 : round
+}
