@@ -35,6 +35,7 @@ export default function QuoteCard() {
           className="font-semibold text-brand underline"
         >
           QuoteSlate API
+          <span className="sr-only"> (opens in a new tab)</span>
         </a>
       </p>
     </section>

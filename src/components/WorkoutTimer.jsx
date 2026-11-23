@@ -96,7 +96,7 @@ export default function WorkoutTimer({ routine }) {
       className={`flex min-h-dvh flex-col items-center justify-between gap-8 p-6 text-center text-white ${phaseStyles[phase]}`}
     >
       <header className="w-full max-w-3xl">
-        <p className="text-lg font-semibold">{routine.name}</p>
+        <h1 className="text-lg font-semibold">{routine.name}</h1>
         <p className="text-xl font-bold">
           {phase === 'finished' ? 'Workout complete!' : `Round ${round} of ${rounds}`}
         </p>

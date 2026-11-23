@@ -61,7 +61,7 @@ export default function History() {
   }
 
   return (
-    <main className="mx-auto max-w-5xl p-6">
+    <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl p-6">
       <h1 className="text-3xl font-bold">Training history</h1>
       {/* The quote loads on its own, separately from the sessions */}
       <div className="mt-4">
