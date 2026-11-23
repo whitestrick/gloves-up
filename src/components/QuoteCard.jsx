@@ -29,12 +29,12 @@ export default function QuoteCard() {
       <p className="mt-3 text-xs text-neutral-600">
         Quotes powered by the{' '}
         <a
-          href="https://github.com/Musheer360/QuoteSlate"
+          href="https://dummyjson.com/docs/quotes"
           target="_blank"
           rel="noreferrer"
           className="font-semibold text-brand underline"
         >
-          QuoteSlate API
+          DummyJSON
           <span className="sr-only"> (opens in a new tab)</span>
         </a>
       </p>

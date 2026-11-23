@@ -16,7 +16,9 @@ export default function useQuote() {
       .then((data) => {
         if (!cancelled) setQuote(data)
       })
-      .catch(() => {
+      .catch((err) => {
+        // The user sees a friendly message; the real reason goes to the console for debugging
+        console.warn('Quote error:', err.message)
         if (!cancelled) setError('Could not load a quote right now.')
       })
       .finally(() => {
