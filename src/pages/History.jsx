@@ -2,6 +2,7 @@ import EmptyState from '../components/EmptyState'
 import ErrorMessage from '../components/ErrorMessage'
 import LinkButton from '../components/LinkButton'
 import Loader from '../components/Loader'
+import QuoteCard from '../components/QuoteCard'
 import SessionCard from '../components/SessionCard'
 import StatCard from '../components/StatCard'
 import useSessions from '../hooks/useSessions'
@@ -62,6 +63,10 @@ export default function History() {
   return (
     <main className="mx-auto max-w-5xl p-6">
       <h1 className="text-3xl font-bold">Training history</h1>
+      {/* The quote loads on its own, separately from the sessions */}
+      <div className="mt-4">
+        <QuoteCard />
+      </div>
       <div className="mt-6">{content}</div>
     </main>
   )
