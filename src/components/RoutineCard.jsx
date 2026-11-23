@@ -1,8 +1,10 @@
+import Button from './Button'
 import LinkButton from './LinkButton'
 import { formatDuration } from '../utils/routineHelpers'
 
 // Shows ONE saved routine. The data arrives through the "routine" prop.
-export default function RoutineCard({ routine }) {
+// "onDelete" is optional: the Delete button only appears if the parent passes it.
+export default function RoutineCard({ routine, onDelete }) {
   const drillCount = routine.drillIds.length
 
   return (
@@ -24,6 +26,12 @@ export default function RoutineCard({ routine }) {
         <LinkButton to={`/routines/${routine.id}/edit`} variant="secondary">
           Edit<span className="sr-only"> {routine.name}</span>
         </LinkButton>
+        {onDelete && (
+          // The card does not delete anything itself. It tells the parent which routine was picked.
+          <Button variant="danger" onClick={() => onDelete(routine)}>
+            Delete<span className="sr-only"> {routine.name}</span>
+          </Button>
+        )}
       </div>
     </article>
   )
