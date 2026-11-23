@@ -1,7 +1,7 @@
 const variants = {
   primary: 'bg-brand text-white border-brand',
   secondary: 'bg-white text-ink border-ink',
-  danger: 'bg-white text-brand border-neutral-400',
+  danger: 'bg-white text-brand border-brand',
 }
 
 // Class names shared by Button and LinkButton, so they always look identical
