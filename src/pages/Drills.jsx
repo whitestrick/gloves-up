@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import Button from '../components/Button'
 import DrillCard from '../components/DrillCard'
+import EmptyState from '../components/EmptyState'
 import FormInput from '../components/FormInput'
 import useRoutineDraft from '../hooks/useRoutineDraft'
 import { drills } from '../data/drills'
@@ -30,6 +32,12 @@ export default function Drills() {
     } else {
       addDrill(id)
     }
+  }
+
+  // Put the search box and category back to their starting values
+  function clearFilters() {
+    setSearch('')
+    setCategory('All')
   }
 
   // The visible list is worked out on every render from the two state values.
@@ -94,9 +102,16 @@ export default function Drills() {
 
       {/* Empty state: shown when nothing matches the filters */}
       {visibleDrills.length === 0 ? (
-        <p className="mt-6 rounded-lg border-[1.5px] border-neutral-300 bg-white p-6">
-          No drills match your search. Try a different word or category.
-        </p>
+        <div className="mt-6">
+          <EmptyState
+            title="No drills found"
+            message="No drills match your search. Try a different word or category."
+          >
+            <Button variant="secondary" onClick={clearFilters}>
+              Clear filters
+            </Button>
+          </EmptyState>
+        </div>
       ) : (
         <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {visibleDrills.map((drill) => (

@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import Loader from './Loader'
 import useAuth from '../hooks/useAuth'
 
 // Wraps every page that needs a logged-in user.
@@ -10,12 +11,9 @@ export default function ProtectedRoute() {
   // Firebase needs a moment to restore the session after a page refresh.
   // While it checks, we must NOT redirect, or a logged-in user would be
   // thrown to /login on every refresh.
+  // The shared Loader replaces the plain text: same spinner and look as everywhere else.
   if (loading) {
-    return (
-      <p role="status" className="p-6 text-neutral-600">
-        Checking your login...
-      </p>
-    )
+    return <Loader label="Checking your login..." />
   }
 
   // Not logged in: go to /login and remember where they wanted to go.
