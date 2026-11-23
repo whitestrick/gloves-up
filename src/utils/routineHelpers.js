@@ -14,3 +14,11 @@ export function formatDuration(totalSeconds) {
   const seconds = safe % 60
   return `${minutes}:${String(seconds).padStart(2, '0')}`
 }
+
+// Which drill id goes with a round? The drills take turns and start over when the list runs out.
+// Round 1 -> first drill, round 2 -> second drill ... then back to the first.
+// "%" is the remainder operator: 4 % 3 = 1, which gives the wrap-around.
+export function drillIdForRound(drillIds, round) {
+  if (drillIds.length === 0) return null
+  return drillIds[(round - 1) % drillIds.length]
+}
