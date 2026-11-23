@@ -1,0 +1,30 @@
+# Runs on every pull request and on every push to main.
+# If lint, tests or the build fail, the check turns red.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      # 1. Download the code
+      - uses: actions/checkout@v5
+
+      # 2. Install Node (22 is new enough for Vitest 5) and cache npm downloads
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      # 3. Install exactly what package-lock.json says (faster and stricter than npm install)
+      - run: npm ci
+
+      # 4. The checks
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
