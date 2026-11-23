@@ -2,6 +2,7 @@ import { createContext } from 'react'
 
 // What an empty routine draft looks like. The provider also uses it to reset.
 export const emptyDraft = {
+  editingId: null, // NEW: null = creating a new routine, otherwise the id being edited
   name: '',
   rounds: 3,
   roundSeconds: 180,

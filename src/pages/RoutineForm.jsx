@@ -1,17 +1,20 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import Button from '../components/Button'
+import ErrorMessage from '../components/ErrorMessage'
 import FormInput from '../components/FormInput'
+import Loader from '../components/Loader'
 import useAuth from '../hooks/useAuth'
 import useRoutineDraft from '../hooks/useRoutineDraft'
 import useToast from '../hooks/useToast'
 import { drills } from '../data/drills'
-import { createRoutine } from '../services/routineService'
+import { createRoutine, getRoutine, updateRoutine } from '../services/routineService'
 import { validateRoutine } from '../utils/validators'
 import { calculateTotalSeconds, formatDuration } from '../utils/routineHelpers'
 
 export default function RoutineForm() {
   const navigate = useNavigate()
+  const { id } = useParams() // NEW: the :id from /routines/:id/edit (undefined on /routines/new)
   const { user } = useAuth()
   const { showToast } = useToast()
   // The form fields live in the shared draft, so they survive a trip to the Drills page
@@ -20,13 +23,60 @@ export default function RoutineForm() {
   const [errors, setErrors] = useState({}) // one message per invalid field
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [loadError, setLoadError] = useState('') // NEW: problem loading the routine to edit
+
+  const isEditing = Boolean(id)
+
+  // NEW: is the draft ready for THIS page?
+  // Editing: the draft must hold this routine. New: the draft must not hold an old edit.
+  // This is worked out on every render, so it needs no state of its own.
+  const draftReady = isEditing ? draft.editingId === id : !draft.editingId
+
+  // NEW: gets the draft ready when the page opens (or the id changes)
+  useEffect(() => {
+    // New-routine page with a leftover edit in the draft: start clean
+    if (!id) {
+      if (draft.editingId) resetDraft()
+      return
+    }
+
+    // The draft already holds this routine (e.g. coming back from the Drills page).
+    // Do nothing, or we would overwrite the user's unsaved changes.
+    if (draft.editingId === id) return
+
+    // Otherwise load the routine from Firestore into the draft
+    let cancelled = false // ignore a late answer if the user has already left
+    getRoutine(id)
+      .then((routine) => {
+        if (cancelled) return
+        if (!routine) {
+          setLoadError('Routine not found.')
+          return
+        }
+        updateDraft({
+          editingId: id,
+          name: routine.name,
+          rounds: routine.rounds,
+          roundSeconds: routine.roundSeconds,
+          restSeconds: routine.restSeconds,
+          drillIds: routine.drillIds,
+        })
+      })
+      .catch(() => {
+        if (!cancelled) setLoadError('Could not load this routine. Please try again.')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [id, draft.editingId, updateDraft, resetDraft])
 
   // Worked out on every render from the draft, so it updates as the user types
   const totalSeconds = calculateTotalSeconds(draft.rounds, draft.roundSeconds, draft.restSeconds)
 
   // The drills the user picked, looked up by id in the drill list
   const selectedDrills = draft.drillIds
-    .map((id) => drills.find((drill) => drill.id === id))
+    .map((drillId) => drills.find((drill) => drill.id === drillId))
     .filter(Boolean)
 
   // Connects an input to the draft: shows the draft value and updates it while typing
@@ -45,21 +95,26 @@ export default function RoutineForm() {
     setErrors(found)
     if (Object.keys(found).length > 0) return
 
-    // 2. Save to Firestore with the signed-in user's id
+    // 2. Save to Firestore: update the existing routine, or create a new one
     setSaving(true)
     setSaveError('')
+    const data = {
+      name: draft.name.trim(),
+      rounds: Number(draft.rounds),
+      roundSeconds: Number(draft.roundSeconds),
+      restSeconds: Number(draft.restSeconds),
+      drillIds: draft.drillIds,
+      totalSeconds,
+    }
     try {
-      await createRoutine(user.uid, {
-        name: draft.name.trim(),
-        rounds: Number(draft.rounds),
-        roundSeconds: Number(draft.roundSeconds),
-        restSeconds: Number(draft.restSeconds),
-        drillIds: draft.drillIds,
-        totalSeconds,
-      })
+      if (isEditing) {
+        await updateRoutine(id, data)
+      } else {
+        await createRoutine(user.uid, data)
+      }
       // 3. Success: clear the draft, tell the user, go to the list
       resetDraft()
-      showToast('Routine saved!')
+      showToast(isEditing ? 'Routine updated!' : 'Routine saved!')
       navigate('/routines')
     } catch {
       setSaveError('Could not save your routine. Please try again.')
@@ -67,9 +122,29 @@ export default function RoutineForm() {
     }
   }
 
+  // NEW: loading and error screens. They come AFTER all the hooks above,
+  // because React needs hooks to run in the same order on every render.
+  if (loadError) {
+    return (
+      <main className="mx-auto max-w-2xl p-6">
+        <ErrorMessage message={loadError} />
+        <Link to="/routines" className="mt-4 inline-block font-semibold text-brand">
+          Back to routines
+        </Link>
+      </main>
+    )
+  }
+  if (!draftReady) {
+    return (
+      <main className="mx-auto max-w-2xl p-6">
+        <Loader label="Loading routine..." />
+      </main>
+    )
+  }
+
   return (
     <main className="mx-auto max-w-2xl p-6">
-      <h1 className="text-3xl font-bold">New routine</h1>
+      <h1 className="text-3xl font-bold">{isEditing ? 'Edit routine' : 'New routine'}</h1>
 
       <form onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-5">
         <FormInput id="name" label="Routine name" placeholder="e.g. Cardio blast" {...bind('name')} error={errors.name} />
@@ -154,9 +229,10 @@ export default function RoutineForm() {
 
         <div className="flex flex-wrap items-center gap-4">
           <Button type="submit" disabled={saving}>
-            {saving ? 'Saving...' : 'Save routine'}
+            {saving ? 'Saving...' : isEditing ? 'Save changes' : 'Save routine'}
           </Button>
-          <Link to="/routines" className="font-semibold text-brand">
+          {/* Cancel throws the draft away so the next form starts clean */}
+          <Link to="/routines" onClick={() => resetDraft()} className="font-semibold text-brand">
             Cancel
           </Link>
         </div>
