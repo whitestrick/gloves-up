@@ -20,6 +20,9 @@ export default function Drills() {
   // A routine is "in progress" once it has a name or at least one drill
   const hasDraft = draftCount > 0 || draft.name.trim() !== ''
 
+  // While editing, Back to routine returns to the edit page, otherwise to the new-routine page
+  const backTo = draft.editingId ? `/routines/${draft.editingId}/edit` : '/routines/new'
+
   // Called by a card's button: add the drill if it is not in the draft, remove it if it is
   function toggleDrill(id) {
     if (draft.drillIds.includes(id)) {
@@ -50,7 +53,7 @@ export default function Drills() {
             <strong>{draft.name.trim() || 'Untitled routine'}</strong>: {draftCount}{' '}
             {draftCount === 1 ? 'drill' : 'drills'} selected
           </p>
-          <Link to="/routines/new" className="font-semibold text-brand">
+          <Link to={backTo} className="font-semibold text-brand">
             Back to routine
           </Link>
         </div>

@@ -1,4 +1,14 @@
-import { addDoc, collection, getDocs, query, serverTimestamp, where } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
+} from 'firebase/firestore'
 import { db } from './firebase'
 
 // Saves a new routine in the "routines" collection.
@@ -23,4 +33,21 @@ export async function getUserRoutines(userId) {
   // createdAt is a Firestore Timestamp; toMillis() turns it into a number we can compare.
   // Sorting here (instead of in the query) means we don't need to create a Firestore index.
   return routines.sort((a, b) => (b.createdAt?.toMillis() ?? 0) - (a.createdAt?.toMillis() ?? 0))
+}
+
+// NEW: gets ONE routine by its id. Returns null if it does not exist.
+export async function getRoutine(id) {
+  // doc(db, 'routines', id) points at one document; getDoc() reads it
+  const snapshot = await getDoc(doc(db, 'routines', id))
+  if (!snapshot.exists()) return null
+  return { id: snapshot.id, ...snapshot.data() }
+}
+
+// NEW: changes fields on an existing routine.
+// updateDoc only touches the fields we send, so userId and createdAt stay as they were.
+export function updateRoutine(id, changes) {
+  return updateDoc(doc(db, 'routines', id), {
+    ...changes,
+    updatedAt: serverTimestamp(), // when it was last edited
+  })
 }
