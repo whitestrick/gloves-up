@@ -1,15 +1,33 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import DrillCard from '../components/DrillCard'
 import FormInput from '../components/FormInput'
+import useRoutineDraft from '../hooks/useRoutineDraft'
 import { drills } from '../data/drills'
 
 // "All" plus every category found in the data. A Set removes the duplicates.
 const categories = ['All', ...new Set(drills.map((drill) => drill.category))]
 
 export default function Drills() {
-  // Two pieces of state: the chosen category and the text in the search box
+  // Local state: only this page cares about the search text and chosen category
   const [category, setCategory] = useState('All')
   const [search, setSearch] = useState('')
+
+  // Shared state from the context: the routine draft is used by several pages
+  const { draft, addDrill, removeDrill } = useRoutineDraft()
+  const draftCount = draft.drillIds.length
+
+  // A routine is "in progress" once it has a name or at least one drill
+  const hasDraft = draftCount > 0 || draft.name.trim() !== ''
+
+  // Called by a card's button: add the drill if it is not in the draft, remove it if it is
+  function toggleDrill(id) {
+    if (draft.drillIds.includes(id)) {
+      removeDrill(id)
+    } else {
+      addDrill(id)
+    }
+  }
 
   // The visible list is worked out on every render from the two state values.
   // It does not need its own state or a useEffect.
@@ -22,7 +40,21 @@ export default function Drills() {
   return (
     <main className="mx-auto max-w-5xl p-6">
       <h1 className="text-3xl font-bold">Drill library</h1>
-      <p className="mt-1 text-neutral-600">Browse boxing drills. You will use them to build routines.</p>
+      <p className="mt-1 text-neutral-600">Browse boxing drills. Add the ones you want to your routine.</p>
+
+      {/* "Back to routine" bar: only shown while a routine is being built.
+          "sticky" keeps it at the top of the screen while the user scrolls the drills. */}
+      {hasDraft && (
+        <div className="sticky top-0 z-10 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border-[1.5px] border-accent bg-white p-4 shadow-sm">
+          <p>
+            <strong>{draft.name.trim() || 'Untitled routine'}</strong>: {draftCount}{' '}
+            {draftCount === 1 ? 'drill' : 'drills'} selected
+          </p>
+          <Link to="/routines/new" className="font-semibold text-brand">
+            Back to routine
+          </Link>
+        </div>
+      )}
 
       {/* Reuses the FormInput component from the login form */}
       <div className="mt-6 max-w-sm">
@@ -67,7 +99,11 @@ export default function Drills() {
           {visibleDrills.map((drill) => (
             // key helps React track each item when the list changes
             <li key={drill.id}>
-              <DrillCard drill={drill} />
+              <DrillCard
+                drill={drill}
+                selected={draft.drillIds.includes(drill.id)}
+                onToggle={toggleDrill}
+              />
             </li>
           ))}
         </ul>
