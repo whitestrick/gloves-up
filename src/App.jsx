@@ -13,7 +13,7 @@ export default function App() {
   const showNavbar = pathname !== '/login' && !pathname.startsWith('/workout')
 
   return (
-    <div className="min-h-screen bg-cream text-ink">
+    <div className="min-h-dvh bg-cream text-ink">
       {showNavbar && <Navbar />}
       <Routes>
         {/* Public page: anyone can open it */}

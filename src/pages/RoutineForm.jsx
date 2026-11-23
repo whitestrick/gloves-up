@@ -128,7 +128,7 @@ export default function RoutineForm() {
     return (
       <main className="mx-auto max-w-2xl p-6">
         <ErrorMessage message={loadError} />
-        <Link to="/routines" className="mt-4 inline-block font-semibold text-brand">
+        <Link to="/routines" className="mt-4 inline-flex min-h-11 items-center font-semibold text-brand">
           Back to routines
         </Link>
       </main>
@@ -185,7 +185,7 @@ export default function RoutineForm() {
             <h2 id="drills-heading" className="text-lg font-bold">
               Drills ({selectedDrills.length})
             </h2>
-            <Link to="/drills" className="font-semibold text-brand">
+            <Link to="/drills" className="inline-flex min-h-11 items-center font-semibold text-brand">
               Add drills
             </Link>
           </div>
@@ -232,7 +232,7 @@ export default function RoutineForm() {
             {saving ? 'Saving...' : isEditing ? 'Save changes' : 'Save routine'}
           </Button>
           {/* Cancel throws the draft away so the next form starts clean */}
-          <Link to="/routines" onClick={() => resetDraft()} className="font-semibold text-brand">
+          <Link to="/routines" onClick={() => resetDraft()} className="inline-flex min-h-11 items-center font-semibold text-brand">
             Cancel
           </Link>
         </div>
