@@ -11,3 +11,30 @@ body {
   margin: 0;
   font-family: Inter, system-ui, sans-serif;
 }
+
+/* ---------- Accessibility ---------- */
+
+/* Visible keyboard focus. A dark ring with a white gap around the element,
+   so it is easy to see on white, cream, the red work screen AND the teal rest screen.
+   :focus-visible shows it for keyboard users only, not on every mouse click. */
+:focus-visible {
+  outline: 3px solid var(--color-ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px #fff;
+}
+
+/* The skip link moves focus to <main> from code. A big ring around the whole page would look odd. */
+main:focus {
+  outline: none;
+}
+
+/* People who set "reduce motion" in their system get no spinning or sliding. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

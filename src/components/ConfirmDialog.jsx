@@ -34,12 +34,13 @@ export default function ConfirmDialog({
         if (!busy) onCancel()
       }}
       aria-labelledby="confirm-title"
+      aria-describedby="confirm-message"
       className="m-auto w-[calc(100%-2rem)] max-w-md rounded-lg border-[1.5px] border-neutral-300 bg-white p-6 backdrop:bg-ink/60"
     >
       <h2 id="confirm-title" className="text-xl font-bold">
         {title}
       </h2>
-      <p className="mt-2 text-neutral-600">{message}</p>
+      <p id="confirm-message" className="mt-2 text-neutral-600">{message}</p>
       <div className="mt-6 flex flex-wrap justify-end gap-3">
         <Button variant="secondary" onClick={onCancel} disabled={busy}>
           Cancel

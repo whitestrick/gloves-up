@@ -12,7 +12,7 @@ export default function FormInput({ id, label, error, ...props }) {
         {...props}
       />
       {error && (
-        <p id={`${id}-error`} className="text-sm text-brand">
+        <p id={`${id}-error`} role="alert" className="text-sm text-brand">
           {error}
         </p>
       )}

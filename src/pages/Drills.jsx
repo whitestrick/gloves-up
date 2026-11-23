@@ -49,7 +49,7 @@ export default function Drills() {
   })
 
   return (
-    <main className="mx-auto max-w-5xl p-6">
+    <main id="main-content" tabIndex={-1} className="mx-auto max-w-5xl p-6">
       <h1 className="text-3xl font-bold">Drill library</h1>
       <p className="mt-1 text-neutral-600">Browse boxing drills. Add the ones you want to your routine.</p>
 

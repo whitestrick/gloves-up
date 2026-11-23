@@ -126,7 +126,7 @@ export default function RoutineForm() {
   // because React needs hooks to run in the same order on every render.
   if (loadError) {
     return (
-      <main className="mx-auto max-w-2xl p-6">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-2xl p-6">
         <ErrorMessage message={loadError} />
         <Link to="/routines" className="mt-4 inline-flex min-h-11 items-center font-semibold text-brand">
           Back to routines
@@ -136,14 +136,14 @@ export default function RoutineForm() {
   }
   if (!draftReady) {
     return (
-      <main className="mx-auto max-w-2xl p-6">
+      <main id="main-content" tabIndex={-1} className="mx-auto max-w-2xl p-6">
         <Loader label="Loading routine..." />
       </main>
     )
   }
 
   return (
-    <main className="mx-auto max-w-2xl p-6">
+    <main id="main-content" tabIndex={-1} className="mx-auto max-w-2xl p-6">
       <h1 className="text-3xl font-bold">{isEditing ? 'Edit routine' : 'New routine'}</h1>
 
       <form onSubmit={handleSubmit} noValidate className="mt-6 flex flex-col gap-5">
