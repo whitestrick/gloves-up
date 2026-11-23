@@ -1,8 +1,13 @@
+import { useEffect } from 'react' // NEW
+import { useNavigate } from 'react-router-dom' // NEW
 import Button from './Button'
 import LinkButton from './LinkButton'
+import useSaveSession from '../hooks/useSaveSession' // NEW
 import useTimer from '../hooks/useTimer'
+import useToast from '../hooks/useToast' // NEW
 import { drills } from '../data/drills'
 import { calculateTotalSeconds, drillIdForRound, formatDuration } from '../utils/routineHelpers'
+import { buildSession } from '../utils/sessionHelpers' // NEW
 
 // Background colour and label for each phase: red for work, teal for rest.
 // (Full class names are written out so Tailwind can find them.)
@@ -19,6 +24,34 @@ export default function WorkoutTimer({ routine }) {
   const { rounds, roundSeconds, restSeconds, drillIds } = routine
   const timer = useTimer({ rounds, roundSeconds, restSeconds })
   const { phase, round, secondsLeft, elapsedSeconds, isRunning } = timer
+  const { status, save } = useSaveSession() // NEW
+  const { showToast } = useToast() // NEW
+  const navigate = useNavigate() // NEW
+
+  // NEW: AUTO-SAVE. When the timer reaches "finished", save the session.
+  // useSaveSession guards against saving twice, so re-running this effect is harmless.
+  useEffect(() => {
+    if (phase === 'finished') {
+      save(buildSession(routine, { phase, round, elapsedSeconds }))
+    }
+  }, [phase, round, elapsedSeconds, routine, save])
+
+  // NEW: the "End and save" button. Stop the clock, save what was done so far, then go to History.
+  async function handleEnd() {
+    timer.pause()
+    const saved = await save(buildSession(routine, { phase, round, elapsedSeconds }))
+    if (saved) {
+      showToast('Session saved!')
+      navigate('/history')
+    } else {
+      showToast('Could not save your session. Try again.')
+    }
+  }
+
+  // NEW: used by the "Try saving again" button after an auto-save failed
+  function handleRetry() {
+    save(buildSession(routine, { phase, round, elapsedSeconds }))
+  }
 
   // Find the full drill object (name + description) for a given round
   function drillForRound(roundNumber) {
@@ -52,6 +85,11 @@ export default function WorkoutTimer({ routine }) {
   // One button does three jobs, so its label depends on where we are
   let mainLabel = 'Pause'
   if (!isRunning) mainLabel = elapsedSeconds === 0 ? 'Start' : 'Resume'
+
+  // NEW: the message under the timer once the workout is over
+  let saveMessage = 'Saving your session...'
+  if (status === 'saved') saveMessage = 'Session saved!'
+  if (status === 'error') saveMessage = 'Could not save your session.'
 
   return (
     <main
@@ -102,28 +140,60 @@ export default function WorkoutTimer({ routine }) {
 
       {/* "secondary" buttons (white) stay visible on every background colour.
           A red "primary" button would disappear on the red work screen. */}
-      <footer className="flex flex-wrap justify-center gap-3">
-        {phase === 'finished' ? (
-          <LinkButton to="/routines" variant="secondary" className="text-xl">
-            Back to routines
-          </LinkButton>
-        ) : (
-          <>
-            <Button
-              variant="secondary"
-              className="text-xl"
-              onClick={isRunning ? timer.pause : timer.resume}
-            >
-              {mainLabel}
-            </Button>
-            <Button variant="secondary" className="text-xl" onClick={timer.skip}>
-              Skip
-            </Button>
-            <LinkButton to="/routines" variant="secondary" className="text-xl">
-              Exit
-            </LinkButton>
-          </>
+      <footer className="flex flex-col items-center gap-4">
+        {/* NEW: save result, announced to screen readers */}
+        {phase === 'finished' && (
+          <p role="status" className="text-xl font-semibold">
+            {saveMessage}
+          </p>
         )}
+
+        <div className="flex flex-wrap justify-center gap-3">
+          {phase === 'finished' ? (
+            <>
+              {status === 'error' && (
+                <Button variant="secondary" className="text-xl" onClick={handleRetry}>
+                  Try saving again
+                </Button>
+              )}
+              <LinkButton to="/history" variant="secondary" className="text-xl">
+                View history
+              </LinkButton>
+              <LinkButton to="/routines" variant="secondary" className="text-xl">
+                Back to routines
+              </LinkButton>
+            </>
+          ) : (
+            <>
+              <Button
+                variant="secondary"
+                className="text-xl"
+                onClick={isRunning ? timer.pause : timer.resume}
+              >
+                {mainLabel}
+              </Button>
+              <Button variant="secondary" className="text-xl" onClick={timer.skip}>
+                Skip
+              </Button>
+              {/* NEW: once the timer has run, ending early SAVES the session.
+                  Before that there is nothing to save, so it is just an Exit link. */}
+              {elapsedSeconds > 0 ? (
+                <Button
+                  variant="secondary"
+                  className="text-xl"
+                  onClick={handleEnd}
+                  disabled={status === 'saving'}
+                >
+                  {status === 'saving' ? 'Saving...' : 'End and save'}
+                </Button>
+              ) : (
+                <LinkButton to="/routines" variant="secondary" className="text-xl">
+                  Exit
+                </LinkButton>
+              )}
+            </>
+          )}
+        </div>
       </footer>
     </main>
   )
