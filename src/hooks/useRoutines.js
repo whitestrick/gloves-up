@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import useAuth from './useAuth'
-import { getUserRoutines } from '../services/routineService'
+import { deleteRoutine, getUserRoutines } from '../services/routineService'
 
 // Loads the signed-in user's routines from Firestore.
-// It returns the list plus "loading" and "error" so the page can show the right thing.
+// It returns the list plus "loading" and "error" so the page can show the right thing,
+// and removeRoutine so the page can delete one.
 export default function useRoutines() {
   const { user } = useAuth()
   const uid = user ? user.uid : null
@@ -36,5 +37,14 @@ export default function useRoutines() {
     }
   }, [uid])
 
-  return { routines, loading, error }
+  // NEW: delete in Firestore FIRST, then remove it from the list on screen.
+  // If Firestore fails, the error is thrown before the list changes, so the
+  // screen never shows a routine as deleted when it still exists.
+  async function removeRoutine(id) {
+    await deleteRoutine(id)
+    // (current) => ... works from the latest list; filter keeps every routine except this one
+    setRoutines((current) => current.filter((routine) => routine.id !== id))
+  }
+
+  return { routines, loading, error, removeRoutine }
 }

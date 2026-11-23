@@ -1,6 +1,7 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -51,3 +52,11 @@ export function updateRoutine(id, changes) {
     updatedAt: serverTimestamp(), // when it was last edited
   })
 }
+
+// NEW: permanently removes one routine document.
+// Your security rules still apply: only the owner (userId == uid) can delete it.
+export function deleteRoutine(id) {
+  return deleteDoc(doc(db, 'routines', id))
+}
+
+
