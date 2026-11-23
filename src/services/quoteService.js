@@ -1,8 +1,8 @@
-// A free public API: no key needed. "tags=motivation" picks motivational quotes,
-// "maxLength=140" keeps them short enough for a card.
-const QUOTE_URL = 'https://quoteslate.vercel.app/api/quotes/random?tags=motivation&maxLength=140'
+// A free public API: no key needed, and it allows requests from a browser.
+// "random" returns ONE quote as { id, quote, author }.
+const QUOTE_URL = 'https://dummyjson.com/quotes/random'
 
-// Gets one motivational quote from an external API.
+// Gets one quote from an external API.
 // Returns { text, author }. Throws an Error if anything goes wrong.
 export async function getMotivationalQuote() {
   // fetch() only rejects when the NETWORK fails (offline, blocked...).
