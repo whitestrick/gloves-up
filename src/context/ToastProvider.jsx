@@ -18,7 +18,7 @@ export default function ToastProvider({ children }) {
       {children}
       <div role="status" aria-live="polite">
         {message && (
-          <p className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-5 py-3 text-white shadow-lg">
+          <p className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 w-max max-w-[90vw] rounded-lg bg-ink px-5 py-3 text-center text-white shadow-lg">
             {message}
           </p>
         )}

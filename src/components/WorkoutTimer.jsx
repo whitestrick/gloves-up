@@ -93,7 +93,7 @@ export default function WorkoutTimer({ routine }) {
 
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between gap-8 p-6 text-center text-white ${phaseStyles[phase]}`}
+      className={`flex min-h-dvh flex-col items-center justify-between gap-8 p-6 text-center text-white ${phaseStyles[phase]}`}
     >
       <header className="w-full max-w-3xl">
         <p className="text-lg font-semibold">{routine.name}</p>
@@ -140,7 +140,7 @@ export default function WorkoutTimer({ routine }) {
 
       {/* "secondary" buttons (white) stay visible on every background colour.
           A red "primary" button would disappear on the red work screen. */}
-      <footer className="flex flex-col items-center gap-4">
+      <footer className="flex w-full flex-col items-center gap-4">
         {/* NEW: save result, announced to screen readers */}
         {phase === 'finished' && (
           <p role="status" className="text-xl font-semibold">
@@ -148,18 +148,18 @@ export default function WorkoutTimer({ routine }) {
           </p>
         )}
 
-        <div className="flex flex-wrap justify-center gap-3">
+        <div className="flex w-full max-w-md flex-wrap justify-center gap-3 sm:w-auto">
           {phase === 'finished' ? (
             <>
               {status === 'error' && (
-                <Button variant="secondary" className="text-xl" onClick={handleRetry}>
+                <Button variant="secondary" className="w-full text-xl sm:w-auto" onClick={handleRetry}>
                   Try saving again
                 </Button>
               )}
-              <LinkButton to="/history" variant="secondary" className="text-xl">
+              <LinkButton to="/history" variant="secondary" className="w-full text-xl sm:w-auto">
                 View history
               </LinkButton>
-              <LinkButton to="/routines" variant="secondary" className="text-xl">
+              <LinkButton to="/routines" variant="secondary" className="w-full text-xl sm:w-auto">
                 Back to routines
               </LinkButton>
             </>
@@ -167,12 +167,12 @@ export default function WorkoutTimer({ routine }) {
             <>
               <Button
                 variant="secondary"
-                className="text-xl"
+                className="w-full text-xl sm:w-auto"
                 onClick={isRunning ? timer.pause : timer.resume}
               >
                 {mainLabel}
               </Button>
-              <Button variant="secondary" className="text-xl" onClick={timer.skip}>
+              <Button variant="secondary" className="w-full text-xl sm:w-auto" onClick={timer.skip}>
                 Skip
               </Button>
               {/* NEW: once the timer has run, ending early SAVES the session.
@@ -180,14 +180,14 @@ export default function WorkoutTimer({ routine }) {
               {elapsedSeconds > 0 ? (
                 <Button
                   variant="secondary"
-                  className="text-xl"
+                  className="w-full text-xl sm:w-auto"
                   onClick={handleEnd}
                   disabled={status === 'saving'}
                 >
                   {status === 'saving' ? 'Saving...' : 'End and save'}
                 </Button>
               ) : (
-                <LinkButton to="/routines" variant="secondary" className="text-xl">
+                <LinkButton to="/routines" variant="secondary" className="w-full text-xl sm:w-auto">
                   Exit
                 </LinkButton>
               )}

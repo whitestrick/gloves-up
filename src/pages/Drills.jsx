@@ -61,7 +61,7 @@ export default function Drills() {
             <strong>{draft.name.trim() || 'Untitled routine'}</strong>: {draftCount}{' '}
             {draftCount === 1 ? 'drill' : 'drills'} selected
           </p>
-          <Link to={backTo} className="font-semibold text-brand">
+          <Link to={backTo} className="inline-flex min-h-11 items-center font-semibold text-brand">
             Back to routine
           </Link>
         </div>
@@ -87,7 +87,7 @@ export default function Drills() {
             type="button"
             aria-pressed={category === name}
             onClick={() => setCategory(name)}
-            className={`min-h-9 cursor-pointer rounded-full border-[1.5px] px-4 text-sm ${
+            className={`min-h-11 cursor-pointer rounded-full border-[1.5px] px-4 text-sm ${
               category === name ? 'border-ink bg-ink text-white' : 'border-neutral-500 bg-white text-ink'
             }`}
           >
