@@ -26,5 +26,5 @@ jobs:
 
       # 4. The checks
       - run: npm run lint
-      - run: npm run test
+      - run: npm run coverage
       - run: npm run build

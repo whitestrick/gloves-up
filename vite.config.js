@@ -9,6 +9,7 @@ export default defineConfig({
     include: ['src/**/*.test.{js,jsx}'],
     coverage: {
       provider: 'v8',
+      thresholds: { lines: 65, statements: 65, functions: 65, branches: 60 },
       reporter: ['text', 'html'], // a table in the terminal + a clickable page
       // Measure EVERY source file, even ones with no test yet, so the percentage is honest
       include: ['src/**/*.{js,jsx}'],
