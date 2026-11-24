@@ -83,7 +83,7 @@ src/
 
 ## Planning
 
-- Wireframes (Figma): TODO_FIGMA_URL
+- Wireframes (Figma): https://www.figma.com/design/Bqli9B9B4IaxUw80IXtTB5/Untitled?node-id=4-20&t=cHtX3dd9KtK5Xstk-1
 - Project board (GitHub Projects): https://github.com/users/whitestrick/projects/12/views/1
 - Colours: brand red `#B3001B` and its complement, teal `#0F766E`, on a cream and ink base.
 
